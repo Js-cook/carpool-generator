@@ -1,4 +1,4 @@
-const apiKey = process.env.ORS_API_KEY
+const apiKey = import.meta.env.VITE_ORS_API_KEY
 const driverManager = []
 const passengerManager = []
 
