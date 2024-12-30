@@ -1,6 +1,10 @@
-const apiKey = import.meta.env.ORS_API_KEY
+const apiKey = process.env.ORS_API_KEY
 const driverManager = []
 const passengerManager = []
+
+if(!apiKey){
+    console.error("no api key found")
+}
 
 export function compileDriverManagerFromPractice(drivers, practiceLocation){
     for(let i = 0; i < drivers.length; i++){
