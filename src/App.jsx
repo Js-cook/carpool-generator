@@ -28,7 +28,7 @@ function App() {
   const driverFormSubmitHandler = () => {
     const driverName = document.querySelector("#driver-name-input").value
     const driverAddress = document.querySelector("#driver-address-input").value
-    const parsedAddress = driverAddress.split(",").map((coord) => parseFloat(coord.trim()))
+    const parsedAddress = driverAddress.split(",").map((coord) => parseFloat(coord.trim())).reverse()
     const driverCapacity = Number(document.querySelector("#driver-capacity-input").value)
 
     if(parsedAddress.length === 2 && driverCapacity > 0){
@@ -42,7 +42,7 @@ function App() {
   const passengerFormSubmitHandler = () => {
     const passengerName = document.querySelector("#passenger-name-input").value
     const passengerAddress = document.querySelector("#passenger-address-input").value
-    const parsedAddress = passengerAddress.split(",").map((coord) => parseFloat(coord.trim()))
+    const parsedAddress = passengerAddress.split(",").map((coord) => parseFloat(coord.trim())).reverse()
 
     // Basic form validation
     if(parsedAddress.length === 2){
