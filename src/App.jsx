@@ -165,7 +165,7 @@ function App() {
               alert("Exception occurred in handling API request, notify creator ASAP")
             }
           }
-          setFormSubmitted(!formSubmitted)
+          setFormSubmitted(true)
         }} id="generate-btn">Generate Carpools</button>
       </div>
       { formSubmitted && 
