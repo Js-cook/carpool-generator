@@ -91,11 +91,12 @@ export async function generateCarpools(){
     console.log(requestPayload)
 
     const headers = {
-        "Authorization": apiKey,
+        // "Authorization": apiKey,
         "Content-Type": "application/json"
     }
 
-    const apiResp = await fetch("https://api.openrouteservice.org/optimization", {
+    // https://api.openrouteservice.org/optimization
+    const apiResp = await fetch("http://localhost:3000/health", {
         method: "POST",
         headers: headers,
         body: JSON.stringify(requestPayload)
