@@ -86,6 +86,7 @@ function findNameById(id){
 }
 
 export async function generateCarpools(){
+    console.log(apiKey)
     const generatedCarpool = {}
     const carpoolAddresses = {}
 
