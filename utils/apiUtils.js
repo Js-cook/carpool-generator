@@ -111,7 +111,7 @@ export async function generateCarpools(){
 
     // https://api.openrouteservice.org/optimization
     // TODO: UPDATE URL
-    const apiResp = await fetch("http://localhost:3000/health", {
+    const apiResp = await fetch(`https://api.geoapify.com/v1/routeplanner?apiKey=${apiKey}`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(requestPayload)
