@@ -8,15 +8,17 @@ if(!apiKey){
 
 export function compileDriverManagerFromPractice(drivers, practiceLocation){
     for(let i = 0; i < drivers.length; i++){
+        // TODO: THIS HAS BEEN UPDATED
         const driverProfile = {
-            "id": i+1,
+            "id": drivers[i]["name"],
             "description": drivers[i]["name"],
-            "profile": "driving-car",
-            "skills": drivers[i]["has8AM"] ? [0, 1] : [0],
-            "start": practiceLocation,
-            "end": drivers[i]["address"],
-            "max_tasks": 2*drivers[i]["capacity"],
-            "capacity": [drivers[i]["capacity"]]
+            // "profile": "driving-car",
+            "capabilities": [drivers[i]["has8AM"] ? [0, 1] : [0]],
+            "start_location": practiceLocation,
+            "end_location": drivers[i]["address"],
+            // "max_tasks": 2*drivers[i]["capacity"],
+            "pickup_capacity": drivers[i]["capacity"],
+            "delivery_capacity": drivers[i]["capacity"]
         }
         driverManager.push(driverProfile)
     }
@@ -24,13 +26,14 @@ export function compileDriverManagerFromPractice(drivers, practiceLocation){
 
 export function compilePassengerManagerFromPractice(passengers, practiceLocation){
     for(let i = 0; i < passengers.length; i++){
+        // TODO: THIS HAS BEEN UPDATED
         const passengerProfile = {
-            "id": i+1,
+            "id": `${passengers[i]["name"]} - ${i+1}`,
             "description": passengers[i]["name"],
-            "amount": [1],
-            "skills": passengers[i]["has8AM"] ? [0, 1] : [0],
-            "pickup": {"id": i+1, "location": practiceLocation},
-            "delivery": {"id": i+1, "location": passengers[i]["address"]}
+            "amount": 1,
+            "requirements": [passengers[i]["has8AM"] ? [0, 1] : [0]],
+            "pickup": {"location": practiceLocation},
+            "delivery": {"location": passengers[i]["address"]}
         }
         passengerManager.push(passengerProfile)
     }
@@ -38,15 +41,17 @@ export function compilePassengerManagerFromPractice(passengers, practiceLocation
 
 export function compileDriverManagerToPractice(drivers, practiceLocation){
     for(let i = 0; i < drivers.length; i++){
+        // TODO: THIS HAS BEEN UPDATED
         const driverProfile = {
-            "id": i+1,
+            "id": drivers[i]["name"],
             "description": drivers[i]["name"],
-            "profile": "driving-car",
-            "skills": [0, 1],
-            "start": drivers[i]["address"],
-            "end": practiceLocation,
-            "max_tasks": 2*drivers[i]["capacity"],
-            "capacity": [drivers[i]["capacity"]]
+            // "profile": "driving-car",
+            "capabilities": [0, 1],
+            "start_location": drivers[i]["address"],
+            "end_location": practiceLocation,
+            // "max_tasks": 2*drivers[i]["capacity"],
+            "pickup_capacity": drivers[i]["capacity"],
+            "delivery_capacity": drivers[i]["capacity"]
         }
         driverManager.push(driverProfile)
     }
@@ -54,13 +59,14 @@ export function compileDriverManagerToPractice(drivers, practiceLocation){
 
 export function compilePassengerManagerToPractice(passengers, practiceLocation){
     for(let i = 0; i < passengers.length; i++){
+        // TODO: THIS HAS BEEN UPDATED
         const passengerProfile = {
-            "id": i+1,
+            "id": `${passengers[i]["name"]} - ${i+1}`,
             "description": passengers[i]["name"],
-            "amount": [1],
-            "skills": [0, 1],
-            "pickup": {"id": i+1, "location": passengers[i]["address"]},
-            "delivery": {"id": i+1, "location": practiceLocation}
+            "amount": 1,
+            "requirements": [0, 1],
+            "pickup": {"location": passengers[i]["address"]},
+            "delivery": {"location": practiceLocation}
         }
         passengerManager.push(passengerProfile)
     }
@@ -83,19 +89,28 @@ export async function generateCarpools(){
     const generatedCarpool = {}
     const carpoolAddresses = {}
 
+    // const requestPayload = {
+    //     "shipments": passengerManager,
+    //     "vehicles": driverManager
+    // }
+
+    // TODO: THIS HAS BEEN UPDATED
     const requestPayload = {
-        "shipments": passengerManager,
-        "vehicles": driverManager
+        "mode": "drive",
+        "agents": driverManager,
+        "shipments": passengerManager
     }
 
     console.log(requestPayload)
 
+    // TODO: THIS HAS BEEN UPDATED
     const headers = {
         // "Authorization": apiKey,
         "Content-Type": "application/json"
     }
 
     // https://api.openrouteservice.org/optimization
+    // TODO: UPDATE URL
     const apiResp = await fetch("http://localhost:3000/health", {
         method: "POST",
         headers: headers,
@@ -104,6 +119,7 @@ export async function generateCarpools(){
     
     const jsonParsedResp = await apiResp.json()
 
+    // TODO: UPDATE PARSING
     console.log(jsonParsedResp)
     if(jsonParsedResp["code"] === 0){
         const allRoutes = jsonParsedResp["routes"]
