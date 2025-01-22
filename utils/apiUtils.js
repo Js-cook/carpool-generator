@@ -13,7 +13,7 @@ export function compileDriverManagerFromPractice(drivers, practiceLocation){
             "id": drivers[i]["name"],
             "description": drivers[i]["name"],
             // "profile": "driving-car",
-            "capabilities": [drivers[i]["has8AM"] ? [0, 1] : [0]],
+            "capabilities": [drivers[i]["has8AM"] ? ["0", "1"] : ["0"]],
             "start_location": practiceLocation,
             "end_location": drivers[i]["address"],
             // "max_tasks": 2*drivers[i]["capacity"],
@@ -31,7 +31,7 @@ export function compilePassengerManagerFromPractice(passengers, practiceLocation
             "id": `${passengers[i]["name"]} - ${i+1}`,
             "description": passengers[i]["name"],
             "amount": 1,
-            "requirements": [passengers[i]["has8AM"] ? [0, 1] : [0]],
+            "requirements": [passengers[i]["has8AM"] ? ["0", "1"] : ["0"]],
             "pickup": {"location": practiceLocation},
             "delivery": {"location": passengers[i]["address"]}
         }
@@ -46,12 +46,12 @@ export function compileDriverManagerToPractice(drivers, practiceLocation){
             "id": drivers[i]["name"],
             "description": drivers[i]["name"],
             // "profile": "driving-car",
-            "capabilities": [0, 1],
+            "capabilities": ["0", "1"],
             "start_location": drivers[i]["address"],
             "end_location": practiceLocation,
             // "max_tasks": 2*drivers[i]["capacity"],
             "pickup_capacity": drivers[i]["capacity"],
-            "delivery_capacity": drivers[i]["capacity"]
+            // "delivery_capacity": drivers[i]["capacity"]
         }
         driverManager.push(driverProfile)
     }
@@ -64,7 +64,7 @@ export function compilePassengerManagerToPractice(passengers, practiceLocation){
             "id": `${passengers[i]["name"]} - ${i+1}`,
             "description": passengers[i]["name"],
             "amount": 1,
-            "requirements": [0, 1],
+            "requirements": ["0", "1"],
             "pickup": {"location": passengers[i]["address"]},
             "delivery": {"location": practiceLocation}
         }
@@ -83,6 +83,11 @@ function findNameById(id){
             return passengerManager[i]["description"]
         }
     }
+}
+
+function getCoordsFromWaypoint(propertiesObj, waypointIndex){
+    const waypoints = propertiesObj["waypoints"]
+    return waypoints[waypointIndex]["original_location"]
 }
 
 export async function generateCarpools(){
@@ -122,25 +127,45 @@ export async function generateCarpools(){
 
     // TODO: UPDATE PARSING
     console.log(jsonParsedResp)
-    if(jsonParsedResp["code"] === 0){
-        const allRoutes = jsonParsedResp["routes"]
-        for(let i = 0; i < allRoutes.length; i++){
-            let driverName = allRoutes[i]["description"]
+    // if(jsonParsedResp["code"] === 0){
+    //     const allRoutes = jsonParsedResp["routes"]
+    //     for(let i = 0; i < allRoutes.length; i++){
+    //         let driverName = allRoutes[i]["description"]
+    //         let passengerList = []
+    //         let passengerAddresses = []
+    //         for(let j = 0; j < allRoutes[i]["steps"].length; j++){
+    //             if(allRoutes[i]["steps"][j]["type"] === "pickup"){
+    //                 passengerList.push(findNameById(allRoutes[i]["steps"][j]["id"]))
+    //                 passengerAddresses.push(allRoutes[i]["steps"][j]["location"].reverse())
+    //             }
+    //         }
+    //         carpoolAddresses[driverName] = passengerAddresses
+    //         generatedCarpool[driverName] = passengerList
+    //     }
+    // } else {
+    //     console.error("ERROR IN API RESPONSE")
+    // }
+    
+    if(jsonParsedResp["type"] === "FeatureCollection"){
+        let agents = jsonParsedResp["features"]
+        for(let i = 0; i < agents.length; i++){
+            let currentAgent = agents[i]["properties"]["agent_id"]
             let passengerList = []
             let passengerAddresses = []
-            for(let j = 0; j < allRoutes[i]["steps"].length; j++){
-                if(allRoutes[i]["steps"][j]["type"] === "pickup"){
-                    passengerList.push(findNameById(allRoutes[i]["steps"][j]["id"]))
-                    passengerAddresses.push(allRoutes[i]["steps"][j]["location"].reverse())
+            for(let j = 0; j < agents[i]["properties"]["actions"].length; j++){
+                // agents[i]["actions"]
+                if(agents[i]["properties"]["actions"][j]["type"] === "pickup"){
+                    console.log(agents[i]["properties"]["actions"][j]["shipment_id"])
+                    passengerList.push(agents[i]["properties"]["actions"][j]["shipment_id"])
+                    passengerAddresses.push(getCoordsFromWaypoint(agents[i]["properties"], agents[i]["properties"]["actions"][j]["waypoint_index"]).reverse())
                 }
             }
-            carpoolAddresses[driverName] = passengerAddresses
-            generatedCarpool[driverName] = passengerList
+            carpoolAddresses[currentAgent] = passengerAddresses
+            generatedCarpool[currentAgent] = passengerList
         }
     } else {
-        console.error("ERROR IN API RESPONSE")
+        alert("Something went wrong... :(")
     }
-    
     resetManagers()
 
     return [generatedCarpool, carpoolAddresses]
